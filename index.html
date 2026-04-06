@@ -573,8 +573,21 @@ tr:hover td{background:#F5F8FF;}
       <div class="cart-head">🛒 Carrinho</div>
       <div class="cart-items" id="cart-items"><div class="empty-state"><div class="ei">🛒</div>Nenhum produto</div></div>
       <div class="cart-foot">
-        <div class="cart-total-row"><span style="font-size:13px;font-weight:600;color:var(--text2)">Total</span><span class="cart-total-val" id="cart-total">R$ 0,00</span></div>
-        <!-- Cliente + botão cadastrar -->
+        <!-- TOTAIS -->
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+          <span style="font-size:12px;color:var(--text2)">Subtotal</span>
+          <span id="cart-subtotal" style="font-size:15px;font-weight:700;color:var(--text)">R$ 0,00</span>
+        </div>
+        <div id="pdv-desc-row" style="display:none;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+          <span style="font-size:12px;color:var(--red)">Desconto</span>
+          <span id="cart-desc-val" style="font-size:13px;font-weight:700;color:var(--red)">− R$ 0,00</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;padding-top:6px;border-top:2px solid var(--border)">
+          <span style="font-size:13px;font-weight:700;color:var(--navy)">Total</span>
+          <span class="cart-total-val" id="cart-total">R$ 0,00</span>
+        </div>
+
+        <!-- CLIENTE -->
         <div style="margin-bottom:8px">
           <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Cliente</label>
           <div style="display:flex;gap:5px;margin-top:3px">
@@ -582,51 +595,30 @@ tr:hover td{background:#F5F8FF;}
             <button onclick="openCliModalPDV()" title="Cadastrar novo cliente" style="padding:6px 10px;background:var(--green);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0">+</button>
           </div>
         </div>
+
+        <!-- CONTA + PAGAMENTO -->
         <div class="fr fr2" style="margin-bottom:8px">
           <div class="fg"><label>Conta</label><select id="pdv-conta"><option>PF Alessandra</option><option>PF Natally</option><option>BTG</option></select></div>
           <div class="fg"><label>Pagamento</label>
-            <select id="pdv-pgto" onchange="togglePDVParc();calcTaxaCart()">
+            <select id="pdv-pgto" onchange="togglePDVParc()">
               <option value="Dinheiro">Dinheiro</option><option value="PIX">PIX</option><option value="Cartão Débito">Cartão Débito</option><option value="credito">Cartão Crédito</option><option value="Boleto">Boleto</option>
             </select>
           </div>
         </div>
-        <div class="fr fr2" style="margin-bottom:8px">
+
+        <!-- PARCELAS + DESCONTO -->
+        <div class="fr fr2" style="margin-bottom:10px">
           <div class="fg" id="pdv-parc-w" style="display:none"><label>Parcelas</label>
-            <select id="pdv-parc" onchange="calcTaxaCart()"><option value="1">1x (à vista)</option><option value="2">2x</option><option value="3">3x</option><option value="4">4x</option><option value="5">5x</option><option value="6">6x</option><option value="7">7x</option><option value="8">8x</option><option value="9">9x</option><option value="10">10x</option><option value="11">11x</option><option value="12">12x</option></select>
+            <select id="pdv-parc"><option value="1">1x (à vista)</option><option value="2">2x</option><option value="3">3x</option><option value="4">4x</option><option value="5">5x</option><option value="6">6x</option><option value="7">7x</option><option value="8">8x</option><option value="9">9x</option><option value="10">10x</option><option value="11">11x</option><option value="12">12x</option></select>
           </div>
-          <!-- DESCONTO -->
           <div class="fg">
             <label>Desconto (R$)</label>
             <input type="number" id="pdv-desconto" min="0" step="0.01" placeholder="0,00"
               style="width:100%;padding:6px 8px;border:1px solid var(--border2);border-radius:6px;font-family:'Nunito',sans-serif;font-size:12px"
-              oninput="calcTaxaCart()">
+              oninput="atualizarTotaisPDV()">
           </div>
         </div>
-        <!-- TAXA MAQUININHA -->
-        <div id="pdv-taxa-wrap" style="background:#FEF0E0;border:1px solid #F5D08A;border-radius:6px;padding:9px 12px;margin-bottom:10px;display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <span style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.6px">💳 Taxa da Maquininha</span>
-            <div style="display:flex;align-items:center;gap:5px">
-              <input type="number" id="pdv-taxa-pct" step="0.1" min="0" max="100" placeholder="%" style="width:58px;padding:4px 7px;border:1px solid #F5D08A;border-radius:5px;font-size:12px;font-weight:700;text-align:center;background:#fff;color:var(--orange)" oninput="calcTaxaCart()">
-              <span style="font-size:11px;color:var(--orange)">%</span>
-            </div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px">
-            <span style="color:var(--text2)">Valor bruto:</span><span id="taxa-bruto" style="font-weight:600">R$ 0,00</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:3px">
-            <span style="color:var(--red)">Desconto da taxa:</span><span id="taxa-desconto" style="font-weight:700;color:var(--red)">− R$ 0,00</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:5px;padding-top:5px;border-top:1px solid #F5D08A">
-            <span style="font-weight:700;color:var(--text)">Valor líquido recebido:</span><span id="taxa-liquido" style="font-weight:700;color:var(--green)">R$ 0,00</span>
-          </div>
-        </div>
-        <!-- RESUMO FINAL -->
-        <div id="pdv-resumo-final" style="display:none;background:#F0FBF5;border:1px solid #A8E6C8;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px">
-          <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Subtotal:</span><span id="prf-sub" style="font-weight:600">R$ 0,00</span></div>
-          <div style="display:flex;justify-content:space-between;margin-top:2px"><span style="color:var(--red)">Desconto:</span><span id="prf-desc" style="font-weight:600;color:var(--red)">− R$ 0,00</span></div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #A8E6C8"><span style="font-weight:700">Total final:</span><span id="prf-total" style="font-weight:700;color:var(--green)">R$ 0,00</span></div>
-        </div>
+
         <button class="btn btn-primary" style="width:100%;padding:10px;justify-content:center" onclick="finalizarVenda()">✓ Finalizar Venda</button>
         <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:6px" onclick="clearCart()">Limpar</button>
       </div>
@@ -1232,21 +1224,7 @@ function renderPDV(){
   }).join(''):`<div class="empty-state" style="grid-column:1/-1"><div class="ei">💎</div>Nenhum produto</div>`;
 }
 function addCart(pid){const p=window.dbData.prods.find(x=>x._id===pid);const it=window.cart.find(x=>x.pid===pid);if(it){if(it.qty<p.qtd)it.qty++;}else window.cart.push({pid,nome:p.nome,preco:p.preco,qty:1});renderCart();}
-function renderCart(){
-  const el=document.getElementById('cart-items');
-  if(!window.cart.length){
-    el.innerHTML=`<div class="empty-state"><div class="ei">🛒</div>Nenhum item</div>`;
-    document.getElementById('cart-total').textContent='R$ 0,00';
-    document.getElementById('pdv-taxa-wrap').style.display='none';
-    return;
-  }
-  el.innerHTML=window.cart.map(it=>`<div class="cart-item">
-    <div><div class="cart-item-name">${it.nome}</div><div class="cart-item-sub">${fmt(it.preco)} × ${it.qty} = ${fmt(it.preco*it.qty)}</div></div>
-    <div class="qty-ctrl"><button class="qbtn" onclick="chgQ('${it.pid}',-1)">−</button><span class="qval">${it.qty}</span><button class="qbtn" onclick="chgQ('${it.pid}',1)">+</button></div>
-  </div>`).join('');
-  document.getElementById('cart-total').textContent=fmt(window.cart.reduce((s,i)=>s+i.preco*i.qty,0));
-  calcTaxaCart();
-}
+
 function chgQ(pid,d){const idx=window.cart.findIndex(x=>x.pid===pid);window.cart[idx].qty+=d;if(window.cart[idx].qty<=0)window.cart.splice(idx,1);renderCart();}
 function clearCart(){
   window.cart=[];
@@ -1265,40 +1243,40 @@ function togglePDVParc(){
   document.getElementById('pdv-parc-w').style.display=v==='credito'?'block':'none';
   calcTaxaCart();
 }
-function calcTaxaCart(){
-  const pgto=document.getElementById('pdv-pgto').value;
-  const taxaWrap=document.getElementById('pdv-taxa-wrap');
+function atualizarTotaisPDV(){
   const subtotal=window.cart.reduce((s,i)=>s+i.preco*i.qty,0);
   const desconto=parseFloat(document.getElementById('pdv-desconto')?.value)||0;
-  const totalComDesc=Math.max(0,subtotal-desconto);
-
-  // Atualiza total no carrinho
-  document.getElementById('cart-total').textContent=fmt(totalComDesc);
-
-  // Resumo final com desconto
-  const resumoEl=document.getElementById('pdv-resumo-final');
-  if(desconto>0&&resumoEl){
-    resumoEl.style.display='block';
-    document.getElementById('prf-sub').textContent=fmt(subtotal);
-    document.getElementById('prf-desc').textContent='− '+fmt(desconto);
-    document.getElementById('prf-total').textContent=fmt(totalComDesc);
-  } else if(resumoEl){
-    resumoEl.style.display='none';
-  }
-
-  // Taxa maquininha
-  if(pgto==='credito'||pgto==='Cartão Débito'){
-    taxaWrap.style.display='block';
-    const pct=parseFloat(document.getElementById('pdv-taxa-pct').value)||0;
-    const taxaValor=totalComDesc*(pct/100);
-    const liquido=totalComDesc-taxaValor;
-    document.getElementById('taxa-bruto').textContent=fmt(totalComDesc);
-    document.getElementById('taxa-desconto').textContent='− '+fmt(taxaValor);
-    document.getElementById('taxa-liquido').textContent=fmt(liquido);
-  } else {
-    taxaWrap.style.display='none';
-  }
+  const total=Math.max(0,subtotal-desconto);
+  document.getElementById('cart-subtotal').textContent=fmt(subtotal);
+  document.getElementById('cart-total').textContent=fmt(total);
+  const descRow=document.getElementById('pdv-desc-row');
+  if(descRow){descRow.style.display=desconto>0?'flex':'none';}
+  const descVal=document.getElementById('cart-desc-val');
+  if(descVal)descVal.textContent='− '+fmt(desconto);
 }
+
+function renderCart(){
+  const el=document.getElementById('cart-items');
+  if(!window.cart.length){
+    el.innerHTML=`<div class="empty-state"><div class="ei">🛒</div>Nenhum item</div>`;
+    document.getElementById('cart-subtotal').textContent='R$ 0,00';
+    document.getElementById('cart-total').textContent='R$ 0,00';
+    return;
+  }
+  el.innerHTML=window.cart.map(it=>`<div class="cart-item">
+    <div><div class="cart-item-name">${it.nome}</div><div class="cart-item-sub">${fmt(it.preco)} × ${it.qty} = ${fmt(it.preco*it.qty)}</div></div>
+    <div class="qty-ctrl"><button class="qbtn" onclick="chgQ('${it.pid}',-1)">−</button><span class="qval">${it.qty}</span><button class="qbtn" onclick="chgQ('${it.pid}',1)">+</button></div>
+  </div>`).join('');
+  atualizarTotaisPDV();
+}
+
+function togglePDVParc(){
+  const v=document.getElementById('pdv-pgto').value;
+  document.getElementById('pdv-parc-w').style.display=v==='credito'?'block':'none';
+}
+
+// Mantido por compatibilidade
+function calcTaxaCart(){ atualizarTotaisPDV(); }
 async function finalizarVenda(){
   if(!window.cart.length)return alert('Carrinho vazio!');
   const subtotal=window.cart.reduce((s,i)=>s+i.preco*i.qty,0);
@@ -1932,16 +1910,43 @@ function renderLucro(){
     {label:'(−) Outros',val:-saidas.filter(l=>!['Compra de Estoque','Embalagem','Marketing','Aluguel','Salário','Taxa Maquininha','Imposto'].includes(l.cat)).reduce((s,l)=>s+l.valor,0),cor:'var(--red)'},
   ].filter(l=>l.val!==0);
   document.getElementById('lucro-resumo').innerHTML=`
-    ${linhasResumo.map(l=>`
+    <!-- RECEITA BRUTA vs LIQUIDA -->
+    <div style="background:#F0FBF5;border-radius:8px;padding:10px 12px;margin-bottom:10px">
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">💰 Receitas</div>
+      <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px">
+        <span style="color:var(--text2)">Receita Bruta (vendas)</span>
+        <span style="font-weight:700;color:var(--green)">${fmt(totalEnt)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px">
+        <span style="color:var(--red)">− Taxa Maquininha</span>
+        <span style="font-weight:700;color:var(--red)">${fmt(totalTaxa)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px">
+        <span style="color:var(--red)">− Embalagens</span>
+        <span style="font-weight:700;color:var(--red)">${fmt(totalEmb)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0 2px;border-top:1px solid #A8E6C8;margin-top:4px;font-size:13px">
+        <span style="font-weight:700">= Receita Líquida</span>
+        <span style="font-weight:700;color:${(totalEnt-totalTaxa-totalEmb)>=0?'var(--green)':'var(--red)'}">${fmt(totalEnt-totalTaxa-totalEmb)}</span>
+      </div>
+    </div>
+    <!-- DEDUÇÕES -->
+    ${linhasResumo.filter(l=>!l.bold&&l.val!==0).map(l=>`
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
-        <span style="font-size:12px;color:var(--text2);font-weight:${l.bold?700:400}">${l.label}</span>
+        <span style="font-size:12px;color:var(--text2)">${l.label}</span>
         <span style="font-size:13px;font-weight:700;color:${l.cor}">${l.val>=0?fmt(l.val):'-'+fmt(Math.abs(l.val))}</span>
       </div>`).join('')}
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 4px;margin-top:4px;border-top:2px solid var(--border)">
-      <span style="font-size:13px;font-weight:700;color:var(--navy)">(=) Lucro Líquido</span>
-      <span style="font-size:18px;font-weight:700;color:${lucroLiq>=0?'var(--green)':'var(--red)'}">${fmt(lucroLiq)}</span>
+    <!-- LUCRO FINAL -->
+    <div style="background:${lucroLiq>=0?'#F0FBF5':'#FEF0EE'};border-radius:8px;padding:10px 12px;margin-top:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;font-weight:700;color:var(--navy)">(=) Lucro Líquido Final</span>
+        <span style="font-size:20px;font-weight:700;color:${lucroLiq>=0?'var(--green)':'var(--red)'}">${fmt(lucroLiq)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--text3)">
+        <span>Margem sobre receita bruta</span>
+        <span style="font-weight:700">${margem.toFixed(1)}%</span>
+      </div>
     </div>
-    <div style="text-align:right;font-size:11px;color:var(--text3);margin-top:2px">Margem: ${margem.toFixed(1)}%</div>
   `;
 
   // ── LUCRO POR CONTA ──
