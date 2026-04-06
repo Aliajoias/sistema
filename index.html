@@ -1572,6 +1572,10 @@ async function saveLanc(){
   const desc=document.getElementById('lanc-desc').value;
   if(!desc)return alert('Informe a descrição');
   const anexo=_lancAnexBase64?{base64:_lancAnexBase64,nome:_lancAnexNome}:null;
+  // Verifica tamanho — base64 de 500KB vira ~680KB de string
+  if(anexo && anexo.base64.length > 700000){
+    return alert('❌ Anexo muito grande para salvar.\nUse uma imagem da NF (foto) ou comprima o PDF em smallpdf.com (máx. 500KB).');
+  }
   const base={tipo,desc,cat:document.getElementById('lanc-cat').value,conta,fpgto,valor:val,
     data:document.getElementById('lanc-data').value||today(),venc,pago,
     dataPgto:pago?(document.getElementById('lanc-dpgto')?.value||today()):'',
@@ -1911,8 +1915,16 @@ let _lancAnexNome = '';
 function previewLancAnexo(evt){
   const file = evt.target.files[0];
   if(!file) return;
+  
+  // Limite de 500KB para não estourar o Firestore
+  if(file.size > 500*1024){
+    alert('❌ Arquivo muito grande! Máximo permitido: 500KB.\n\nDica: Comprima o PDF em smallpdf.com ou tire uma foto da NF em vez de usar o PDF completo.');
+    evt.target.value='';
+    return;
+  }
+  
   _lancAnexNome = file.name;
-  document.getElementById('lanc-anx-nome').textContent = file.name;
+  document.getElementById('lanc-anx-nome').textContent = file.name + ` (${(file.size/1024).toFixed(0)}KB)`;
   document.getElementById('lanc-anx-rm').style.display = 'inline-flex';
   const reader = new FileReader();
   reader.onload = e => {
